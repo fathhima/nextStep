@@ -58,7 +58,7 @@ export default function Jobs() {
         {jobs.length === 0 ? (
           <div className="bg-white border shadow-sm rounded-2xl p-10 text-center">
             <h3 className="text-xl font-semibold text-gray-800">
-              No job applications yet
+              No job applications yet.
             </h3>
             <p className="text-gray-600 mt-2">
               Start by adding your first job application.
