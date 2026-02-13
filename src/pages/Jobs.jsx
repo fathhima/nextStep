@@ -17,8 +17,8 @@ export default function Jobs() {
       job.id === id ? { ...job, status: newStatus } : job
     );
 
-    setJobs(updatedJobs); // UI updates instantly
-    saveJobs(updatedJobs); // localStorage updates
+    setJobs(updatedJobs);
+    saveJobs(updatedJobs);
   };
 
   const handleDelete = (id) => {
@@ -30,8 +30,32 @@ export default function Jobs() {
 
     const updatedJobs = jobs.filter((job) => job.id !== id);
 
-    setJobs(updatedJobs); // UI updates instantly
-    saveJobs(updatedJobs); // localStorage updates
+    setJobs(updatedJobs);
+    saveJobs(updatedJobs);
+  };
+
+  const getPriority = (job) => {
+    if (job.status === "Rejected" || job.status === "Offer") {
+      return { label: "Closed", style: "bg-gray-200 text-gray-700" };
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const followUp = new Date(job.followUpDate);
+    followUp.setHours(0, 0, 0, 0);
+
+    const diffDays = Math.ceil((followUp - today) / (1000 * 60 * 60 * 24));
+
+    if (diffDays < 0) {
+      return { label: "Overdue", style: "bg-red-100 text-red-700" };
+    }
+
+    if (diffDays <= 2) {
+      return { label: "Due Soon", style: "bg-yellow-100 text-yellow-800" };
+    }
+
+    return { label: "Not Due", style: "bg-green-100 text-green-700" };
   };
 
   return (
@@ -58,7 +82,7 @@ export default function Jobs() {
         {jobs.length === 0 ? (
           <div className="bg-white border shadow-sm rounded-2xl p-10 text-center">
             <h3 className="text-xl font-semibold text-gray-800">
-              No job applications yet.
+              No job applications yet
             </h3>
             <p className="text-gray-600 mt-2">
               Start by adding your first job application.
@@ -82,68 +106,81 @@ export default function Jobs() {
                     <th className="px-6 py-4">Role</th>
                     <th className="px-6 py-4">Status</th>
                     <th className="px-6 py-4">Follow-up Date</th>
+                    <th className="px-6 py-4">Priority</th>
                     <th className="px-6 py-4 text-center">Actions</th>
                   </tr>
                 </thead>
 
                 <tbody>
-                  {jobs.map((job) => (
-                    <tr
-                      key={job.id}
-                      className="border-t hover:bg-gray-50 transition"
-                    >
-                      <td className="px-6 py-4 font-medium text-gray-900">
-                        {job.company}
-                      </td>
+                  {jobs.map((job) => {
+                    const priority = getPriority(job);
 
-                      <td className="px-6 py-4 text-gray-700">{job.role}</td>
+                    return (
+                      <tr
+                        key={job.id}
+                        className="border-t hover:bg-gray-50 transition"
+                      >
+                        <td className="px-6 py-4 font-medium text-gray-900">
+                          {job.company}
+                        </td>
 
-                      <td className="px-6 py-4">
-                        <select
-                          value={job.status}
-                          onChange={(e) =>
-                            handleStatusChange(job.id, e.target.value)
-                          }
-                          className="border rounded-lg px-3 py-1.5 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        >
-                          <option value="Applied">Applied</option>
-                          <option value="Interview">Interview</option>
-                          <option value="Rejected">Rejected</option>
-                          <option value="Offer">Offer</option>
-                        </select>
-                      </td>
+                        <td className="px-6 py-4 text-gray-700">{job.role}</td>
 
-                      <td className="px-6 py-4 text-gray-700">
-                        {job.followUpDate}
-                      </td>
-
-                      <td className="px-6 py-4 text-center">
-                        <div className="flex justify-center gap-2">
-                          {job.link ? (
-                            <a
-                              href={job.link}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="px-3 py-1.5 rounded-lg bg-gray-100 text-gray-800 font-medium hover:bg-gray-200 transition"
-                            >
-                              Link
-                            </a>
-                          ) : (
-                            <span className="px-3 py-1.5 rounded-lg bg-gray-50 text-gray-400 font-medium">
-                              No Link
-                            </span>
-                          )}
-
-                          <button
-                            onClick={() => handleDelete(job.id)}
-                            className="px-3 py-1.5 rounded-lg bg-red-500 text-white font-medium hover:bg-red-600 transition"
+                        <td className="px-6 py-4">
+                          <select
+                            value={job.status}
+                            onChange={(e) =>
+                              handleStatusChange(job.id, e.target.value)
+                            }
+                            className="border rounded-lg px-3 py-1.5 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                           >
-                            Delete
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                            <option value="Applied">Applied</option>
+                            <option value="Interview">Interview</option>
+                            <option value="Rejected">Rejected</option>
+                            <option value="Offer">Offer</option>
+                          </select>
+                        </td>
+
+                        <td className="px-6 py-4 text-gray-700">
+                          {job.followUpDate}
+                        </td>
+
+                        <td className="px-6 py-4">
+                          <span
+                            className={`px-3 py-1 rounded-full text-xs font-semibold ${priority.style}`}
+                          >
+                            {priority.label}
+                          </span>
+                        </td>
+
+                        <td className="px-6 py-4 text-center">
+                          <div className="flex justify-center gap-2">
+                            {job.link ? (
+                              <a
+                                href={job.link}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="px-3 py-1.5 rounded-lg bg-gray-100 text-gray-800 font-medium hover:bg-gray-200 transition"
+                              >
+                                Link
+                              </a>
+                            ) : (
+                              <span className="px-3 py-1.5 rounded-lg bg-gray-50 text-gray-400 font-medium">
+                                No Link
+                              </span>
+                            )}
+
+                            <button
+                              onClick={() => handleDelete(job.id)}
+                              className="px-3 py-1.5 rounded-lg bg-red-500 text-white font-medium hover:bg-red-600 transition"
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
