@@ -3,9 +3,13 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getJobs, saveJobs } from "../utils/storage";
+import EmailModal from "../components/EmailModal";
 
 export default function Jobs() {
   const [jobs, setJobs] = useState([]);
+  const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
+  const [selectedJob, setSelectedJob] = useState(null);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -56,6 +60,16 @@ export default function Jobs() {
     }
 
     return { label: "Not Due", style: "bg-green-100 text-green-700" };
+  };
+
+  const handleGenerateEmail = (job) => {
+    setSelectedJob(job);
+    setIsEmailModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsEmailModalOpen(false);
+    setSelectedJob(null);
   };
 
   return (
@@ -154,7 +168,14 @@ export default function Jobs() {
                         </td>
 
                         <td className="px-6 py-4 text-center">
-                          <div className="flex justify-center gap-2">
+                          <div className="flex flex-wrap justify-center gap-2">
+                            <button
+                              onClick={() => handleGenerateEmail(job)}
+                              className="px-3 py-1.5 rounded-lg bg-blue-100 text-blue-700 font-medium hover:bg-blue-200 transition"
+                            >
+                              Generate Email
+                            </button>
+
                             {job.link ? (
                               <a
                                 href={job.link}
@@ -192,6 +213,13 @@ export default function Jobs() {
           </div>
         )}
       </div>
+
+      {/* Email Modal */}
+      <EmailModal
+        isOpen={isEmailModalOpen}
+        onClose={handleCloseModal}
+        job={selectedJob}
+      />
     </div>
   );
 }
