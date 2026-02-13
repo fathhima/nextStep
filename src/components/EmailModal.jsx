@@ -1,10 +1,6 @@
 // src/components/EmailModal.jsx
 
-import { useState } from "react";
-
 export default function EmailModal({ isOpen, onClose, job }) {
-  const [copied, setCopied] = useState(false);
-
   if (!isOpen || !job) return null;
 
   const subject = `Follow-up on my application for ${job.role} at ${job.company}`;
@@ -22,16 +18,10 @@ Thank you for your time and consideration.
 Best regards,
 [Your Name]`;
 
-  const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(`Subject: ${subject}\n\n${body}`);
-      setCopied(true);
-
-      setTimeout(() => setCopied(false), 2000);
-    } catch (error) {
-      alert("Failed to copy. Please copy manually.");
-    }
-  };
+  // encode subject + body for URL
+  const mailtoLink = `mailto:?subject=${encodeURIComponent(
+    subject
+  )}&body=${encodeURIComponent(body)}`;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
@@ -43,7 +33,7 @@ Best regards,
               Follow-up Email Template
             </h2>
             <p className="text-gray-600 text-sm mt-1">
-              Copy and send this email to follow up.
+              Click below to open your email app with a drafted message.
             </p>
           </div>
 
@@ -77,12 +67,12 @@ Best regards,
 
         {/* Buttons */}
         <div className="flex flex-col sm:flex-row gap-3">
-          <button
-            onClick={handleCopy}
-            className="flex-1 bg-blue-600 text-white py-2.5 rounded-xl font-semibold hover:bg-blue-700 transition"
+          <a
+            href={mailtoLink}
+            className="flex-1 text-center bg-blue-600 text-white py-2.5 rounded-xl font-semibold hover:bg-blue-700 transition"
           >
-            {copied ? "Copied ✅" : "Copy to Clipboard"}
-          </button>
+            Open in Email
+          </a>
 
           <button
             onClick={onClose}
