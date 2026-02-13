@@ -3,7 +3,7 @@ import Navbar from "./components/Navbar";
 
 import Dashboard from "./pages/Dashboard";
 import Jobs from "./pages/Jobs";
-import AddJob from "./pages/AddJob";
+import AddJob from "./pages/Addjob";
 
 export default function App() {
   return (
