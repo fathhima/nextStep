@@ -12,23 +12,26 @@ export default function Jobs() {
     setJobs(getJobs());
   }, []);
 
-  const handleDelete = (id) => {
-    const confirmDelete = confirm("Are you sure you want to delete this job?");
-
-    if (!confirmDelete) return;
-
-    const updatedJobs = jobs.filter((job) => job.id !== id);
-    setJobs(updatedJobs);
-    saveJobs(updatedJobs);
-  };
-
   const handleStatusChange = (id, newStatus) => {
     const updatedJobs = jobs.map((job) =>
       job.id === id ? { ...job, status: newStatus } : job
     );
 
-    setJobs(updatedJobs);
-    saveJobs(updatedJobs);
+    setJobs(updatedJobs); // UI updates instantly
+    saveJobs(updatedJobs); // localStorage updates
+  };
+
+  const handleDelete = (id) => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this job?"
+    );
+
+    if (!confirmDelete) return;
+
+    const updatedJobs = jobs.filter((job) => job.id !== id);
+
+    setJobs(updatedJobs); // UI updates instantly
+    saveJobs(updatedJobs); // localStorage updates
   };
 
   return (
@@ -106,7 +109,7 @@ export default function Jobs() {
                           <option value="Applied">Applied</option>
                           <option value="Interview">Interview</option>
                           <option value="Rejected">Rejected</option>
-                          <option value="Selected">Selected</option>
+                          <option value="Offer">Offer</option>
                         </select>
                       </td>
 
@@ -126,12 +129,9 @@ export default function Jobs() {
                               Link
                             </a>
                           ) : (
-                            <button
-                              disabled
-                              className="px-3 py-1.5 rounded-lg bg-gray-50 text-gray-400 font-medium cursor-not-allowed"
-                            >
+                            <span className="px-3 py-1.5 rounded-lg bg-gray-50 text-gray-400 font-medium">
                               No Link
-                            </button>
+                            </span>
                           )}
 
                           <button
