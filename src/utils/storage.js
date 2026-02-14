@@ -13,6 +13,7 @@ import { db } from "../firebase";
 const jobsRef = collection(db, "jobs");
 
 // GET ALL JOBS
+
 export const getJobs = async () => {
   try {
     const q = query(jobsRef, orderBy("createdAt", "desc"));
@@ -29,6 +30,7 @@ export const getJobs = async () => {
 };
 
 // ADD JOB
+
 export const saveJob = async (jobData) => {
   try {
     const docRef = await addDoc(jobsRef, jobData);
@@ -40,6 +42,7 @@ export const saveJob = async (jobData) => {
 };
 
 // DELETE JOB
+
 export const deleteJob = async (jobId) => {
   try {
     await deleteDoc(doc(db, "jobs", jobId));
@@ -49,6 +52,7 @@ export const deleteJob = async (jobId) => {
 };
 
 // UPDATE STATUS
+
 export const updateJobStatus = async (jobId, status) => {
   try {
     await updateDoc(doc(db, "jobs", jobId), { status });

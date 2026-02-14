@@ -1,5 +1,3 @@
-// src/pages/AddJob.jsx
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { saveJob } from "../utils/storage";

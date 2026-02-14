@@ -1,5 +1,3 @@
-// src/components/EmailModal.jsx
-
 export default function EmailModal({ isOpen, onClose, job }) {
   if (!isOpen || !job) return null;
 
@@ -18,7 +16,6 @@ Thank you for your time and consideration.
 Best regards,
 [Your Name]`;
 
-  // encode subject + body for URL
   const mailtoLink = `mailto:?subject=${encodeURIComponent(
     subject
   )}&body=${encodeURIComponent(body)}`;
@@ -26,7 +23,9 @@ Best regards,
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
       <div className="w-full max-w-2xl bg-white rounded-2xl shadow-lg border p-6 relative">
+
         {/* Header */}
+
         <div className="flex justify-between items-start mb-4">
           <div>
             <h2 className="text-xl font-bold text-gray-900">
@@ -46,6 +45,7 @@ Best regards,
         </div>
 
         {/* Subject */}
+
         <div className="mb-4">
           <label className="block text-sm font-semibold text-gray-700 mb-1">
             Subject
@@ -56,6 +56,7 @@ Best regards,
         </div>
 
         {/* Body */}
+
         <div className="mb-6">
           <label className="block text-sm font-semibold text-gray-700 mb-1">
             Email Body
@@ -66,6 +67,7 @@ Best regards,
         </div>
 
         {/* Buttons */}
+        
         <div className="flex flex-col sm:flex-row gap-3">
           <a
             href={mailtoLink}
