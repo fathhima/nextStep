@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getJobs, saveJobs } from "../utils/storage";
+import { saveJob } from "../utils/storage";
 
 export default function AddJob() {
   const navigate = useNavigate();
@@ -18,6 +18,8 @@ export default function AddJob() {
     notes: "",
   });
 
+  const [loading, setLoading] = useState(false);
+
   const handleChange = (e) => {
     setFormData((prev) => ({
       ...prev,
@@ -25,7 +27,7 @@ export default function AddJob() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!formData.company.trim() || !formData.role.trim()) {
@@ -33,31 +35,36 @@ export default function AddJob() {
       return;
     }
 
-    const appliedDateObj = new Date(formData.appliedDate);
-    const followUpDaysNum = Number(formData.followUpDays);
+    setLoading(true);
 
-    const followUpDateObj = new Date(appliedDateObj);
-    followUpDateObj.setDate(appliedDateObj.getDate() + followUpDaysNum);
+    try {
+      const appliedDateObj = new Date(formData.appliedDate);
+      const followUpDaysNum = Number(formData.followUpDays);
 
-    const job = {
-      id: crypto.randomUUID ? crypto.randomUUID() : Date.now(),
-      company: formData.company.trim(),
-      role: formData.role.trim(),
-      link: formData.link.trim(),
-      appliedDate: formData.appliedDate,
-      followUpDays: followUpDaysNum,
-      followUpDate: followUpDateObj.toISOString().split("T")[0],
-      notes: formData.notes.trim(),
-      status: "Applied",
-      createdAt: new Date().toISOString(),
-    };
+      const followUpDateObj = new Date(appliedDateObj);
+      followUpDateObj.setDate(appliedDateObj.getDate() + followUpDaysNum);
 
-    const existingJobs = getJobs();
-    const updatedJobs = [job, ...existingJobs];
+      const job = {
+        company: formData.company.trim(),
+        role: formData.role.trim(),
+        link: formData.link.trim(),
+        appliedDate: formData.appliedDate,
+        followUpDays: followUpDaysNum,
+        followUpDate: followUpDateObj.toISOString().split("T")[0],
+        notes: formData.notes.trim(),
+        status: "Applied",
+        createdAt: new Date().toISOString(),
+      };
 
-    saveJobs(updatedJobs);
+      await saveJob(job);
 
-    navigate("/jobs");
+      navigate("/jobs");
+    } catch (error) {
+      console.log(error);
+      alert("Something went wrong while saving job.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -67,11 +74,10 @@ export default function AddJob() {
           Add Job Application
         </h2>
         <p className="text-gray-600 mb-6">
-          Track your job applications and follow-up dates easily.
+          Save your job applications in Firebase.
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-5">
-          {/* Company */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Company <span className="text-red-500">*</span>
@@ -87,7 +93,6 @@ export default function AddJob() {
             />
           </div>
 
-          {/* Role */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Role <span className="text-red-500">*</span>
@@ -103,7 +108,6 @@ export default function AddJob() {
             />
           </div>
 
-          {/* Link */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Job Link (optional)
@@ -118,7 +122,6 @@ export default function AddJob() {
             />
           </div>
 
-          {/* Applied Date */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Applied Date
@@ -132,7 +135,6 @@ export default function AddJob() {
             />
           </div>
 
-          {/* Follow Up Days */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Follow-up Reminder
@@ -149,7 +151,6 @@ export default function AddJob() {
             </select>
           </div>
 
-          {/* Notes */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Notes
@@ -158,29 +159,19 @@ export default function AddJob() {
               name="notes"
               value={formData.notes}
               onChange={handleChange}
-              placeholder="Eg: HR contacted me, asked for resume..."
               rows="4"
+              placeholder="Eg: HR contacted me..."
               className="w-full border rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
             />
           </div>
 
-          {/* Buttons */}
-          <div className="flex flex-col sm:flex-row gap-3 pt-2">
-            <button
-              type="submit"
-              className="w-full sm:w-auto flex-1 bg-blue-600 text-white py-2.5 rounded-xl font-semibold hover:bg-blue-700 transition"
-            >
-              Save Job
-            </button>
-
-            <button
-              type="button"
-              onClick={() => navigate("/jobs")}
-              className="w-full sm:w-auto flex-1 bg-gray-100 text-gray-800 py-2.5 rounded-xl font-semibold hover:bg-gray-200 transition"
-            >
-              Cancel
-            </button>
-          </div>
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-blue-600 text-white py-2.5 rounded-xl font-semibold hover:bg-blue-700 transition disabled:opacity-50"
+          >
+            {loading ? "Saving..." : "Save Job"}
+          </button>
         </form>
       </div>
     </div>

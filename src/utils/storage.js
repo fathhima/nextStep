@@ -1,30 +1,60 @@
 // src/utils/storage.js
 
-const JOBS_KEY = "jobs";
+import {
+  collection,
+  getDocs,
+  addDoc,
+  deleteDoc,
+  doc,
+  updateDoc,
+  query,
+  orderBy,
+} from "firebase/firestore";
+import { db } from "../firebase";
 
-export const getJobs = () => {
+const jobsRef = collection(db, "jobs");
+
+// GET ALL JOBS
+export const getJobs = async () => {
   try {
-    const storedJobs = localStorage.getItem(JOBS_KEY);
+    const q = query(jobsRef, orderBy("createdAt", "desc"));
+    const snapshot = await getDocs(q);
 
-    if (!storedJobs) return [];
-
-    const parsedJobs = JSON.parse(storedJobs);
-
-    return Array.isArray(parsedJobs) ? parsedJobs : [];
+    return snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
   } catch (error) {
-    console.error("Error reading jobs from localStorage:", error);
+    console.error("Error fetching jobs:", error);
     return [];
   }
 };
 
-export const saveJobs = (jobsArray) => {
+// ADD JOB
+export const saveJob = async (jobData) => {
   try {
-    if (!Array.isArray(jobsArray)) {
-      throw new Error("saveJobs expects an array");
-    }
-
-    localStorage.setItem(JOBS_KEY, JSON.stringify(jobsArray));
+    const docRef = await addDoc(jobsRef, jobData);
+    return docRef.id;
   } catch (error) {
-    console.error("Error saving jobs to localStorage:", error);
+    console.error("Error saving job:", error);
+    return null;
+  }
+};
+
+// DELETE JOB
+export const deleteJob = async (jobId) => {
+  try {
+    await deleteDoc(doc(db, "jobs", jobId));
+  } catch (error) {
+    console.error("Error deleting job:", error);
+  }
+};
+
+// UPDATE STATUS
+export const updateJobStatus = async (jobId, status) => {
+  try {
+    await updateDoc(doc(db, "jobs", jobId), { status });
+  } catch (error) {
+    console.error("Error updating status:", error);
   }
 };

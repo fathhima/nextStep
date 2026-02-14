@@ -2,40 +2,87 @@
 
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getJobs, saveJobs } from "../utils/storage";
 import EmailModal from "../components/EmailModal";
+import { getJobs, deleteJob, updateJobStatus } from "../utils/storage";
+import toast from "react-hot-toast";
 
 export default function Jobs() {
   const [jobs, setJobs] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
   const [selectedJob, setSelectedJob] = useState(null);
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    setJobs(getJobs());
+    const fetchJobs = async () => {
+      setLoading(true);
+      const jobsData = await getJobs();
+      setJobs(jobsData);
+      setLoading(false);
+    };
+
+    fetchJobs();
   }, []);
 
-  const handleStatusChange = (id, newStatus) => {
+  const handleStatusChange = async (id, newStatus) => {
     const updatedJobs = jobs.map((job) =>
       job.id === id ? { ...job, status: newStatus } : job
     );
 
     setJobs(updatedJobs);
-    saveJobs(updatedJobs);
+
+    try {
+      await updateJobStatus(id, newStatus);
+      toast.success("Status updated");
+    } catch (error) {
+      toast.error("Failed to update status");
+    }
   };
 
-  const handleDelete = (id) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this job?"
+  const handleDelete = async (id) => {
+    toast(
+      (t) => (
+        <div className="flex flex-col gap-3">
+          <p className="text-sm font-medium text-gray-800">
+            Are you sure you want to delete this job?
+          </p>
+
+          <div className="flex gap-2 justify-end">
+            <button
+              onClick={() => toast.dismiss(t.id)}
+              className="px-3 py-1.5 rounded-lg bg-gray-100 text-gray-800 font-medium hover:bg-gray-200 transition"
+            >
+              Cancel
+            </button>
+
+            <button
+              onClick={async () => {
+                toast.dismiss(t.id);
+
+                // UI update instantly
+                const updatedJobs = jobs.filter((job) => job.id !== id);
+                setJobs(updatedJobs);
+
+                try {
+                  await deleteJob(id);
+                  toast.success("Job deleted successfully");
+                } catch (error) {
+                  toast.error("Failed to delete job");
+                }
+              }}
+              className="px-3 py-1.5 rounded-lg bg-red-500 text-white font-medium hover:bg-red-600 transition"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+      ),
+      {
+        duration: 6000,
+      }
     );
-
-    if (!confirmDelete) return;
-
-    const updatedJobs = jobs.filter((job) => job.id !== id);
-
-    setJobs(updatedJobs);
-    saveJobs(updatedJobs);
   };
 
   const getPriority = (job) => {
@@ -92,8 +139,12 @@ export default function Jobs() {
           </button>
         </div>
 
-        {/* Empty State */}
-        {jobs.length === 0 ? (
+        {/* Loading State */}
+        {loading ? (
+          <div className="bg-white border shadow-sm rounded-2xl p-10 text-center text-gray-600 font-medium">
+            Loading jobs...
+          </div>
+        ) : jobs.length === 0 ? (
           <div className="bg-white border shadow-sm rounded-2xl p-10 text-center">
             <h3 className="text-xl font-semibold text-gray-800">
               No job applications yet
@@ -111,7 +162,6 @@ export default function Jobs() {
           </div>
         ) : (
           <div className="bg-white border shadow-sm rounded-2xl overflow-hidden">
-            {/* Responsive Table */}
             <div className="overflow-x-auto">
               <table className="min-w-full text-sm text-left">
                 <thead className="bg-gray-100 text-gray-700 uppercase text-xs">
@@ -206,7 +256,6 @@ export default function Jobs() {
               </table>
             </div>
 
-            {/* Footer */}
             <div className="px-6 py-4 bg-gray-50 text-sm text-gray-600">
               Total Jobs: <span className="font-semibold">{jobs.length}</span>
             </div>
@@ -214,7 +263,6 @@ export default function Jobs() {
         )}
       </div>
 
-      {/* Email Modal */}
       <EmailModal
         isOpen={isEmailModalOpen}
         onClose={handleCloseModal}
