@@ -15,7 +15,7 @@
 https://next-step-bice.vercel.app
 
 ### Project Description
-**NextStep** is a smart job application tracker that helps users manage job applications, track job status, and prioritize follow-ups. It also generates a professional follow-up email draft and opens it directly in the email app using mailto integration.
+**NextStep** is a productivity tool for job seekers that turns job applications into actionable follow-ups. It tracks applications, prioritizes overdue follow-ups, and helps users send professional follow-up emails with one click.
 
 ### The Problem statement
 Job seekers apply to multiple companies but often forget:
