@@ -3,7 +3,7 @@ import Navbar from "./components/Navbar";
 
 import Dashboard from "./pages/Dashboard";
 import Jobs from "./pages/Jobs";
-import AddJob from "./pages/Addjob";
+import Addjob from "./pages/Addjob";
 
 export default function App() {
   return (
@@ -17,7 +17,7 @@ export default function App() {
 
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/jobs" element={<Jobs />} />
-          <Route path="/add" element={<AddJob />} />
+          <Route path="/add" element={<Addjob />} />
 
           <Route
             path="*"
