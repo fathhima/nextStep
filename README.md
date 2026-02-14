@@ -9,7 +9,7 @@
 ### Team Name: [Individual]
 
 ### Team Members
-- Member 1: [Fathima Sadakkathulah] - [Indira Gandhi National Open University]
+- Member 1: Fathima Sadakkathulah - [Indira Gandhi National Open University]
 
 ### Hosted Project Link
 https://next-step-bice.vercel.app
