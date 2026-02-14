@@ -12,7 +12,7 @@
 - Member 1: [Fathima Sadakkathulah] - [Indira Gandhi National Open University]
 
 ### Hosted Project Link
-https://next-step-bice.vercel.app/dashboard
+https://next-step-bice.vercel.app
 
 ### Project Description
 **NextStep** is a smart job application tracker that helps users manage job applications, track job status, and prioritize follow-ups. It also generates a professional follow-up email draft and opens it directly in the email app using mailto integration.
